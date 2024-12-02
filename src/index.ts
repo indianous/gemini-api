@@ -1,19 +1,38 @@
-import { extractKeyWords } from "./bot/extrat-key-words";
-import { save } from "./utils/fs";
-import { Response } from "./types/response";
 import { simpleQuestion } from "./utils/user-input";
-import { getFileName } from "./utils/get-file-name";
+import { Database } from "./database";
+import { ChatRepository } from "./repository/chat";
+import { CreateChatUseCase } from "./useCase/createChat";
+import { MessageRepository } from "./repository/message";
+import { SaveMessageUseCase } from "./useCase/saveMessage";
+import { faker } from "@faker-js/faker";
 
 async function main() {
-  const response = await extractKeyWords(
-    simpleQuestion("Texto para extrair as palavras chaves: ")
+  console.log("Aplicação funcionando!");
+  // criar chat
+  const database = new Database();
+  const chatRepository = new ChatRepository(database);
+  const createChat = new CreateChatUseCase(chatRepository);
+  const { id: chatId } = await createChat.execute(
+    simpleQuestion("Qual é o nome do chat? ")
   );
-  return response;
+  const messageRepository = new MessageRepository(database);
+  const saveMessage = new SaveMessageUseCase(messageRepository);
+  let exit = "";
+  do {
+    // enviar mensagem
+    const youcontent = simpleQuestion("Você: ");
+    saveMessage.execute({
+      chat: { id: chatId, message: { role: "you", content: youcontent } },
+    });
+
+    // receber mensagem
+    const botcontent = faker.lorem.paragraph();
+    console.log("Bot: ", botcontent);
+    saveMessage.execute({
+      chat: { id: chatId, message: { role: "you", content: botcontent } },
+    });
+    exit = simpleQuestion("Sair? (S/N) ");
+  } while (exit != "S");
 }
 
-console.log("Aplicação funcionando!");
-main().then((response: Response) => {
-  const fileName = getFileName();
-  save(response.prompt + "\n" + response.content, fileName);
-  console.log("Bye, bye!");
-});
+main().then();

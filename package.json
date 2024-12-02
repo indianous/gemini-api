@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@types/node": "^22.9.1",
     "@types/readline-sync": "^1.4.8",
     "tsx": "^4.19.2",
@@ -20,6 +21,8 @@
     "@google/generative-ai": "^0.21.0",
     "dotenv": "^16.4.5",
     "readline-sync": "^1.4.10",
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.0.3",
     "zod": "^3.23.8"
   }
 }
